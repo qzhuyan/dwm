@@ -19,7 +19,7 @@ static const char col_cyan[]        = "#005577";
 static const char *colors[][3]      = {
 	/*               fg         bg         border   */
 	[SchemeNorm] = { col_gray3, col_gray1, col_gray2 },
-	[SchemeSel]  = { col_gray4, col_cyan,  col_cyan  },
+	[SchemeSel] =  { col_gray4, col_cyan,  col_cyan  },
 };
 
 /* tagging */
@@ -32,10 +32,10 @@ static const Rule rules[] = {
 	 */
 	/* class      instance    title       tags mask     isfloating   monitor */
 	{ "Gimp",     NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1 << 3,       0,           -1 },
   { "copyq",    NULL,       NULL,       0,            1,           -1 },
   { "Emacs",    NULL,       NULL,       1 << 1,       0,           -1 },
-  { "dwm",      NULL,       NULL,       0,            1,           -1 },
+	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
+  { "Slack",  NULL,       NULL,       1 << 8,       0,           -1 },
 };
 
 /* layout(s) */
@@ -50,7 +50,6 @@ static const Layout layouts[] = {
 	{ "[M]",      monocle },
   { "|M|",      centeredmaster },
 	{ ">M>",      centeredfloatingmaster },
-  //{ "[E]",      emacsgod}     /* emacs god mode */
 };
 
 /* key definitions */
@@ -61,39 +60,45 @@ static const Layout layouts[] = {
 	{ MODKEY|ShiftMask,             KEY,      tag,            {.ui = 1 << TAG} }, \
 	{ MODKEY|ControlMask|ShiftMask, KEY,      toggletag,      {.ui = 1 << TAG} },
 
-
 /* helper for spawning shell commands in the pre dwm-5.0 fashion */
 #define SHCMD(cmd) { .v = (const char*[]){ "/bin/sh", "-c", cmd, NULL } }
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, "-c", NULL };
-static const char *termcmd[]  = { "urxvt", NULL };
+static const char *termcmd[]  = { "terminator", NULL };
+static const char *spotify_next[] = {"dbus-send","--print-reply","--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Next", NULL};
+static const char *spotify_prev[] = {"dbus-send","--print-reply","--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Previous", NULL};
+static const char *spotify_pause[]= {"dbus-send","--print-reply","--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.PlayPause", NULL};
+static const char *vol_up[] = {"bash", "-c", "pactl set-sink-volume 1 +5%", NULL};
+static const char *vol_down[]= {"bash", "-c", "pactl set-sink-volume 1 -5%", NULL};
+static const char *mute[]= {"bash", "-c", "pactl set-sink-mute 1 toggle", NULL};
+static const char *lightdown[]= {"xbacklight", "-dec", "5",NULL};
+static const char *lightup[]= {"xbacklight", "-inc", "5",NULL};
+static const char *kblightdown[]= {"mba_kbbacklight", "down",NULL};
+static const char *kblightup[]= {"mba_kbbacklight", "up", NULL};
 static const char *clipcmd[]  = { "copyq", "menu", NULL };
-static const char *inc_backlight[]  = { "xbacklight", "+10", NULL };
-static const char *dec_backlight[]  = { "xbacklight", "-10", NULL };
-static const char *spotify_next[] = {"dbus-send"," --print-reply"," --dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Next", NULL};
-static const char *spotify_prev[] = {"dbus-send"," --print-reply"," --dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Previous", NULL};
-static const char *spotify_pause[]= {"dbus-send"," --print-reply"," --dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.PlayPause", NULL};
+
 static const char *slock[] = { "slock", NULL };
-static const char *vol_up[] = { "vol_ctl", "up", NULL };
-static const char *vol_down[] = { "vol_ctl", "down", NULL };
-static const char *vol_mute[] = { "vol_ctl", "mute", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
-	{ MODKEY|ShiftMask,             XK_p,      spawn,          {.v = clipcmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
   { MODKEY|ShiftMask,             XK_l,      spawn,          {.v = slock } },
+  { MODKEY|ShiftMask,             XK_p,      spawn,          {.v = clipcmd } },
   { MODKEY,                       XK_Right,  spawn,          {.v = spotify_next } },
   { MODKEY,                       XK_Left,   spawn,          {.v = spotify_prev } },
   { MODKEY,                       XK_grave,  spawn,          {.v = spotify_pause } },
-  {0,                             0x1008ff02,spawn,          {.v = inc_backlight}},
-  {0,                             0x1008ff03,spawn,          {.v = dec_backlight}},
-  {0,                             0x1008ff11,spawn,          {.v = vol_down}},
-  {0,                             0x1008ff12,spawn,          {.v = vol_mute}},
-  {0,                             0x1008ff13,spawn,          {.v = vol_up}},
+  { 0 ,                           0x1008ff11,spawn,          {.v = vol_up } },
+  { 0 ,                           0x1008ff12,spawn,          {.v = mute } },
+  { 0 ,                           0x1008ff13,spawn,          {.v = vol_down } },
+  { 0 ,                           0x1008ff03,spawn,          {.v = lightdown } },
+  { 0 ,                           0x1008ff02,spawn,          {.v = lightup } },
+  { 0 ,                           0x1008ff06,spawn,          {.v = kblightdown } },
+  { 0 ,                           0x1008ff05,spawn,          {.v = kblightup } },
+  { MODKEY ,                      0x1008ff11,spawn,          {.v = lightdown } },
+  { MODKEY ,                      0x1008ff13,spawn,          {.v = lightup } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
 	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
