@@ -35,7 +35,8 @@ static const Rule rules[] = {
   { "copyq",    NULL,       NULL,       0,            1,           -1 },
   { "Emacs",    NULL,       NULL,       1 << 1,       0,           -1 },
 	{ "Firefox",  NULL,       NULL,       1 << 8,       0,           -1 },
-  { "Slack",  NULL,       NULL,       1 << 8,       0,           -1 },
+  { "Slack",    NULL,       NULL,       1 << 8,       0,           -1 },
+  { "Albert",    NULL,       NULL,       0,            1,           -1 },
 };
 
 /* layout(s) */
@@ -70,22 +71,24 @@ static const char *termcmd[]  = { "terminator", NULL };
 static const char *spotify_next[] = {"dbus-send","--print-reply","--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Next", NULL};
 static const char *spotify_prev[] = {"dbus-send","--print-reply","--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.Previous", NULL};
 static const char *spotify_pause[]= {"dbus-send","--print-reply","--dest=org.mpris.MediaPlayer2.spotify", "/org/mpris/MediaPlayer2", "org.mpris.MediaPlayer2.Player.PlayPause", NULL};
-static const char *vol_up[] = {"bash", "-c", "pactl set-sink-volume 1 +5%", NULL};
-static const char *vol_down[]= {"bash", "-c", "pactl set-sink-volume 1 -5%", NULL};
-static const char *mute[]= {"bash", "-c", "pactl set-sink-mute 1 toggle", NULL};
+static const char *vol_up[] = {"bash", "-c", "pactl set-sink-volume 0 +5%", NULL};
+static const char *vol_down[]= {"bash", "-c", "pactl set-sink-volume 0 -5%", NULL};
+static const char *mute[]= {"bash", "-c", "pactl set-sink-mute 0 toggle", NULL};
 static const char *lightdown[]= {"xbacklight", "-dec", "5",NULL};
 static const char *lightup[]= {"xbacklight", "-inc", "5",NULL};
 static const char *kblightdown[]= {"mba_kbbacklight", "down",NULL};
 static const char *kblightup[]= {"mba_kbbacklight", "up", NULL};
 static const char *clipcmd[]  = { "copyq", "menu", NULL };
+static const char *albert[]  = { "albert", "show", NULL };
 
 static const char *slock[] = { "slock", NULL };
 
 static Key keys[] = {
 	/* modifier                     key        function        argument */
-	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
+	{ MODKEY|ShiftMask,             XK_l,      spawn,          {.v = dmenucmd } },
 	{ MODKEY|ShiftMask,             XK_Return, spawn,          {.v = termcmd } },
-  { MODKEY|ShiftMask,             XK_l,      spawn,          {.v = slock } },
+	{ MODKEY,                       XK_p,      spawn,          {.v = albert } },
+  { MODKEY|ControlMask,           XK_q,      spawn,          {.v = slock } },
   { MODKEY|ShiftMask,             XK_p,      spawn,          {.v = clipcmd } },
   { MODKEY,                       XK_Right,  spawn,          {.v = spotify_next } },
   { MODKEY,                       XK_Left,   spawn,          {.v = spotify_prev } },
